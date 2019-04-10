@@ -1,5 +1,6 @@
 package ua.procamp;
 
+import org.hibernate.Session;
 import ua.procamp.exception.QueryHelperException;
 
 import javax.persistence.EntityManager;
@@ -30,9 +31,14 @@ public class QueryHelper {
      */
     public <T> T readWithinTx(Function<EntityManager, T> entityManagerConsumer) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
-//        entityManager.unwrap(Session.class)
+        entityManager.unwrap(Session.class).setDefaultReadOnly(true);
         entityManager.getTransaction().begin();
-//        entityManager.
-//        entityManagerConsumer.andThen(e -> throw new QueryHelperException("Error performing query. Transaction is rolled back", e))
+        try {
+            T result = entityManagerConsumer.apply(entityManager);
+            return result;
+        } catch (Exception ex) {
+            entityManager.getTransaction().rollback();
+            throw new QueryHelperException("Error performing query. Transaction is rolled back ", ex);
+        }
     }
 }
