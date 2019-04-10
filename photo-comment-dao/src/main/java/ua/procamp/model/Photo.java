@@ -1,8 +1,9 @@
 package ua.procamp.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,18 +26,34 @@ import java.util.List;
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@EqualsAndHashCode(of = "id")
+@Entity
+@Table(name = "photo")
 public class Photo {
+
+    @Id
+    @GeneratedValue
     private Long id;
+
+    @Column(name = "url", unique = true, nullable = false)
     private String url;
+
+    @Column(name = "description")
     private String description;
-    private List<PhotoComment> comments;
+
+    @Setter(value = AccessLevel.PRIVATE)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "photo")
+    private List<PhotoComment> comments = new ArrayList<>();
 
     public void addComment(PhotoComment comment) {
-        throw new UnsupportedOperationException("Make me work!");
+        comment.setPhoto(this);
+        comments.add(comment);
     }
 
     public void removeComment(PhotoComment comment) {
-        throw new UnsupportedOperationException("Make me work!");
+        comment.setPhoto(null);
+        comments.remove(comment);
     }
 
 }

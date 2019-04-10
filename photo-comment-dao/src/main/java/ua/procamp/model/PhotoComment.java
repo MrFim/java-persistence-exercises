@@ -1,8 +1,12 @@
 package ua.procamp.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnTransformer;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
@@ -21,9 +25,23 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@EqualsAndHashCode(of = "id")
+@Entity
+@Table(name = "photo_comment")
 public class PhotoComment {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @Column(name = "text", nullable = false)
     private String text;
+
+    @Column(name = "created_on")
     private LocalDateTime createdOn;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "photo_id")
     private Photo photo;
 }
