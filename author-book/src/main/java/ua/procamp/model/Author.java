@@ -1,11 +1,10 @@
 package ua.procamp.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.CascadeType;
+import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -34,17 +33,49 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
+@Entity
+@Table(name = "author")
 public class Author {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @Column(name = "first_name", nullable = false)
     private String firstName;
+
+    @Column(name = "last_name", nullable = false)
     private String lastName;
-    private Set<Book> books;
+
+    @Setter(AccessLevel.PRIVATE)
+    @ManyToMany( cascade = CascadeType.PERSIST)
+    @JoinTable(
+            name = "author_book",
+            joinColumns = {@JoinColumn(name = "author_id")},
+            inverseJoinColumns = {@JoinColumn(name = "book_id")}
+    )
+    private Set<Book> books = new HashSet<>();
 
     public void addBook(Book book) {
-        throw new UnsupportedOperationException("Are you kidding me?");
+        book.getAuthors().add(this);
+        books.add(book);
     }
 
     public void removeBook(Book book) {
-        throw new UnsupportedOperationException("Are you kidding me?");
+        book.getAuthors().remove(this);
+        books.remove(book);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Author author = (Author) o;
+        return Objects.equals(id, author.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return 31;
     }
 }

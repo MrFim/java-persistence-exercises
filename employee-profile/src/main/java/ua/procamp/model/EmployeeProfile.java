@@ -1,8 +1,11 @@
 package ua.procamp.model;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import javax.persistence.*;
 
 /**
  * todo:
@@ -20,9 +23,23 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode(of = "id")
+@Entity
+@Table(name = "employee_profile")
 public class EmployeeProfile {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @MapsId
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "employee_id")
     private Employee employee;
+
+    @Column(name = "position", nullable = false)
     private String position;
+
+    @Column(name = "department", nullable = false)
     private String department;
 }
